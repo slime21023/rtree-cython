@@ -1,23 +1,25 @@
-cimport numpy as np
-
-ctypedef cnp.npy_float32 float32
+cimport numpy as cnp
+ctypedef cnp.float64_t f64
 ctypedef cnp.npy_uint32 uint
 
-cdef struct Rect:
-    floating[:]  min
-    floating[:]  max
+cdef class Rect:
+    cdef public f64[:] mins
+    cdef public f64[:] maxs
+    cdef bint is_overlapping(self, Rect o)
 
-# R-tree entry(leaf and non-leaf node)
-cdef struct RNode:
-    bool is_leaf
-    uint level
-    uint count
-    Rect rect
-    list items
-    RNode* children
 
-cdef RNode* create_rnode(uint max_children)
-cdef void free_rnode(RNode* node, uint max_children)
+cdef class RNode:
+    cdef bint is_leaf
+    cdef uint level
+    cdef uint count
+
+    # R-tree node entry(leaf and non-leaf node)
+    cdef Rect rect
+    cdef list items
+    cdef RNode* children
+
+    
+
 
 cdef class _Rtree:
     cdef public uint n_dims      # Number of dimensions 
@@ -26,13 +28,9 @@ cdef class _Rtree:
     cdef public uint height
     cdef RNode* root
 
-    cdef list search(self, Rect r)
-    cdef void insert(self, Rect r, object item)
-    cdef RNode* choose_leaf(self, Rect r, object item)
-    cdef void adjust_tree(self, RNode* leaf)
-    cdef void delete(self, Rect r, object item)
-    cdef RNode* find_leaf(self, Rect r, object item)
-    cdef void condense_tree(self, RNode* leaf)
-    cdef RNode* split(self, RNode* leaf)
-    cdef (RNode*, RNode*) pick_seeds(self, RNode* leaf)
-    cdef RNode* PickNext(self, RNode* g1, RNode* g2)
+    cdef public list search(self, Rect r)
+    cdef public void insert(self, Rect r, object item)
+    cdef public void delete(self, Rect r, object item)
+    cdef public list search_datapoint(self, f64[:] key)
+    cdef public void insert_datapoint(self, f64[:] key, object value)
+    cdef public void delete_datapoint(self, f64[:] key, object value)

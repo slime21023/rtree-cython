@@ -1,20 +1,46 @@
 from libc.stdlib cimport malloc, free
 cimport numpy as cnp
-
-ctypedef cnp.npy_float32 float32
+ctypedef cnp.float64_t f64
 ctypedef cnp.npy_uint32 uint
 
-cdef RNode* create_rnode(uint max_children, is_leaf=true):
-    cdef RNode* node = <Rect *>malloc(sizeof(RNode))
-    if not is_leaf:
-        node.children = <Rect *>malloc(sizeof(RNode) * max_children )
-    return node
+cdef class Rect:
+    cdef public f64[:] mins
+    cdef public f64[:] maxs
 
-cdef void free_rnode(RNode* node, uint max_children):
-    if not node.is_leaf:
-        for i in range(max_children):
-            free_rnode(node.children[i], max_children)
-    free(node)
+    def __cinit__(self, f64[:] mins, f64[:] maxs):
+        self.mins = mins.copy()
+        self.maxs = maxs.copy()
+
+    cdef bint is_overlapping(self, Rect o):
+        cdef int dim = 0
+        cdef bint result = True
+        cdef bint condition_one = True
+        cdef bint condition_two = True
+        
+        for dim in range(self.mins.shape[0]):
+            condition_one = not (o.mins[dim] <= self.mins[dim] and self.mins[dim] <= o.maxs[dim])
+            condition_two = not (self.mins[dim] <= o.mins[dim] and o.mins[dim] <= self.maxs[dim])
+            if not (condition_one or condition_two):
+                result = False
+                break
+        
+        return result
+
+
+cdef class RNode:
+    """
+    The R-tree Node (non-leaf node and leaf node)
+    """
+    def __cinit__(self, bint is_leaf=true, uint max_children):
+        self.is_leaf = is_leaf
+        if not is_leaf:
+            self.children = <RNode *> malloc(max_children * sizeof(RNode))
+
+    def __dealloc__(self):
+        if not self.is_leaf:
+            free(self.children)
+    
+
 
 
 cdef class _Rtree:
@@ -32,11 +58,3 @@ cdef class _Rtree:
         """Destructor."""
         # Free all inner structures
         free_rnode(self.root, self.max_children)
-
-    cdef list search(self, Rect r):
-        
-         
-
-    cdef void inset(self, Rect r, object item):
-                
-            
