@@ -33,6 +33,7 @@ cdef class RNode:
     """
     def __cinit__(self, bint is_leaf=true, uint max_children):
         self.is_leaf = is_leaf
+        self.count = 0
         if not is_leaf:
             self.children = <RNode *> malloc(max_children * sizeof(RNode))
 
