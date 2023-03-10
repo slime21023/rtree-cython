@@ -13,5 +13,8 @@ cdef class RNode:
     cdef list items
     cdef list children
     
-    cdef public list search(self, Rect r)
+    cdef list search(self, Rect r)
+
+    # Insert Algorithms
+    cdef void insert(self, Rect r, object item)
     

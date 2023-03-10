@@ -17,3 +17,13 @@ cdef class Rect:
                 break
         
         return result
+
+    cdef void enlarge(self, Rect r):
+        cdef int dim = 0
+        for dim in range(self.mins.shape[0]):
+            if r.mins[dim] < self.mins[dim]:
+                self.mins[dim] = r.mins[dim] - 25.0
+            if r.maxs[dim] > self.maxs[dim]:
+                self.maxs[dim] = r.maxs[dim] + 25.0
+
+            

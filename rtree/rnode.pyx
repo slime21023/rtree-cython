@@ -25,3 +25,22 @@ cdef class RNode:
             for idx in range(self.count):
                 result += self.children[idx].search(r)
             return result
+
+    cdef RNode choose_leaf(self, Rect r):
+        cdef int idx = 0
+
+        if self.is_leaf:
+            return self
+        else:
+            for idx in range(len(self.children)):
+                self.children[idx].enlarge(r)
+            
+            return self.children[idx].choose_leaf(r)
+
+    cdef void insert(self, Rect r, object item, uint max_size):
+        cdef RNode node = choose_leaf(self)
+
+        node.items.append(item)
+        if node.count > max_children:
+            l, ll = node.split_node() 
+            
