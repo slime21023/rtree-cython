@@ -14,7 +14,9 @@ cdef class RNode:
     cdef list children
     
     cdef list search(self, Rect r)
+    cdef RNode choose_leaf(self, Rect r)
+    cdef tuple split_node(self)
+    # cdef 
 
     # Insert Algorithms
-    cdef void insert(self, Rect r, object item)
-    
+    cdef void insert(self, Rect r, object item, uint max_size)
