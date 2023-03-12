@@ -3,7 +3,7 @@ cdef class MBR:
         self.mins = mins.copy()
         self.maxs = maxs.copy()
 
-    cdef bint is_overlapping(self, Rect o):
+    cdef bint is_overlapping(self, MBR o):
         cdef int dim = 0
         cdef bint result = True
         cdef bint condition_one = True
@@ -18,7 +18,7 @@ cdef class MBR:
         
         return result
 
-    cdef void enlarge(self, Rect r):
+    cdef void enlarge(self, MBR r):
         cdef int dim = 0
         for dim in range(self.mins.shape[0]):
         if r.mins[dim] < self.mins[dim]:
@@ -34,29 +34,29 @@ cdef class MBR:
 
         return v
     
-    cdef f64 overlapped_volume(self, Rect r):
+    cdef f64 overlapped_volume(self, MBR r):
         cdef f64 v = 1
         cdef int dim = 0
         cdef f64 cur_min, cur_max
         if not self.is_overlapping(r):
-        return 0
+            return 0
         else:
-        for dim in range(self.mins.shape[0]):
-            cur_min = self.mins[dim] if self.mins[dim] > r.mins[dim] else r.mins[dim]
-            cur_max = self.maxs[dim] if self.maxs[dim] < r.maxs[dim] else r.maxs[dim]
-            v *= (cur_max - cur_min)
+            for dim in range(self.mins.shape[0]):
+                cur_min = self.mins[dim] if self.mins[dim] > r.mins[dim] else r.mins[dim]
+                cur_max = self.maxs[dim] if self.maxs[dim] < r.maxs[dim] else r.maxs[dim]
+                v *= (cur_max - cur_min)
         return v
 
-    cdef bint is_cover(self, Rect r):
+    cdef bint is_cover(self, MBR r):
         cdef int dim = 0
         cdef bint result = True
         for dim in range(self.mins.shape[0]):
-        if not ((self.mins[dim] <= r.mins[dim]) and (self.maxs[dim] >= r.maxs[dim])):
-            result = False
-            break
+            if not ((self.mins[dim] <= r.mins[dim]) and (self.maxs[dim] >= r.maxs[dim])):
+                result = False
+                break
         return result
 
-    cdef f64 distance(self, Rect r):
+    cdef f64 distance(self, MBR r):
         cdef f64 d = 0
         cdef int dim = 0
         cdef f64 temp1, temp2

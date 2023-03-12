@@ -1,32 +1,40 @@
 
+cdef class LeafEntry:
+    def __cinit__(self, MBR mbr, object item):
+        self.mbr = mbr
+        self.item = item
+
 
 cdef class RNode:
     """
     The R-tree Node (non-leaf node and leaf node)
     """
-    def __cinit__(self, Rect r, bint is_leaf=True):
+    def __cinit__(self, MBR mbr, bint is_leaf=True):
         self.is_leaf = is_leaf
+        self.mbr = mbr
         self.count = 0
-        self.rect = r
         if not is_leaf:
             self.children = []
         else:
             self.items = []
     
-    cdef public list search(self, Rect r):
+    cdef list search(self, MBR q):
         cdef int idx =0
-        if not self.rect.is_overlapping(r):
-            return []
-
-        if self.is_leaf:
-            return self.items
-        else:
-            result = []
-            for idx in range(self.count):
-                result += self.children[idx].search(r)
+        cdef list result = []
+        if not self.mbr.is_overlapping(q):
             return result
 
-    cdef RNode choose_leaf(self, Rect r):
+        if self.is_leaf:
+            for idx in range(len(self.items)):
+                if q.is_overlapping(self.items[idx].mbr):
+                    result.append(self.items[idx])
+            return result
+        else:
+            for idx in range(len(self.children)):
+                result += self.children[idx].search(q)
+            return result
+
+    cdef RNode choose_leaf(self, MBR q):
         cdef int idx = 0
 
         if self.is_leaf:
@@ -37,7 +45,7 @@ cdef class RNode:
             
             return self.children[idx].choose_leaf(r)
 
-    cdef void insert(self, Rect r, object item, uint max_size):
+    cdef void insert(self, MBR r, object item, uint max_size):
         cdef RNode node = choose_leaf(self)
 
         node.items.append(item)
