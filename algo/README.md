@@ -146,7 +146,7 @@ class RNode:
 			return self
 		else:
 			for idx in range(len(self.children)):
-				calc = self.children[idx].overlapped_volume(q)
+				calc = self.children[idx].mbr.overlapped_volume(q)
 				if calc > temp:
 					temp = calc
 					selected = idx
@@ -156,7 +156,7 @@ class RNode:
 				calc = 0
 				temp = 0
 				for idx in range(len(self.children)):
-					calc = self.children[idx].distance(q)
+					calc = self.children[idx].mbr.distance(q)
 					if idx == 0;
 						temp = calc
 						selected = idx
@@ -184,7 +184,7 @@ class RNode:
 
 		# check is all overlapping	
 		for idx in range(1, len(seeds)):
-			if not seeds[0].mbr.is_overlapping(seeds[idx]):
+			if not seeds[0].mbr.is_overlapping(seeds[idx].mbr):
 				is_overlapping = False
 				break
 		
@@ -351,7 +351,7 @@ class RNode:
 			# remove the non leaf from this node
 			for idx in range(temp):
 				self.children.remove(temp[idx])
-			parent.childern += temp
+			parent.children += temp
 		
 		# check the size of children
 		if len(self.children) > max_size:
@@ -470,7 +470,7 @@ class RTree:
 		if self.root == None:
 			return []
 		
-		self.root.search(mbr)
+		return self.root.search(mbr)
 
 	def delete(self, entry: LeafEntry):
 		if self.root == None:

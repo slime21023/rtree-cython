@@ -1,0 +1,8 @@
+[project]
+name = "rtree_cython"
+version = "0.0.1"
+
+
+[build-system]
+requires = ["setuptools", "wheel", "Cython"]
+build-backend = "setuptools.build_meta"
