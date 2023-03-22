@@ -1,3 +1,4 @@
 rtree/*.c
 build
+lib
 .ipynb_checkpoints
